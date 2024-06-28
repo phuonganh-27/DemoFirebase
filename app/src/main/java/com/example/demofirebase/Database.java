@@ -1,58 +1,77 @@
 package com.example.demofirebase;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 public class Database extends SQLiteOpenHelper {
-    public static final String DATABASE_NAME = "user.db";
+    private static final String DB_NAME = "user.db";
+    private static final int DB_VERSION = 1;
+    private final Context mContext;
+    public Database(Context context) {
+        super(context, DB_NAME, null, DB_VERSION);
+        this.mContext = context;
+    }
+    @Override
+    public void onCreate(SQLiteDatabase db) {
 
-    public Database(Context context) {super(context, DATABASE_NAME, null, 1);}
+    }
+    public void initializeDatabaseFromAssets() {
+        if (!checkDatabaseExists()) {
+            try {
+                InputStream inputStream = mContext.getAssets().open(DB_NAME);
+                String outFileName = getDatabasePath().getPath();
+                OutputStream outputStream = new FileOutputStream(outFileName);
+                byte[] buffer = new byte[1024];
+                int length;
+                while ((length = inputStream.read(buffer)) > 0) {
+                    outputStream.write(buffer, 0, length);
+                }
+                outputStream.flush();
+                outputStream.close();
+                inputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    private boolean checkDatabaseExists() {
+        File dbFile = mContext.getDatabasePath(DB_NAME);
+        return dbFile.exists();
+    }
 
-    public void onCreate(SQLiteDatabase db){
-        db.execSQL("create table Users(id integer primary key AUTOINCREMENT, email text, password text)");
+    // Get the path to the database
+    private File getDatabasePath() {
+        return mContext.getDatabasePath(DB_NAME);
+    }
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
     }
 
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion){
-        db.execSQL("DROP TABLE IF EXISTS Users   ");
-        onCreate(db);
-    }
-
-    public void insert(){
-        SQLiteDatabase db = this.getWritableDatabase();
-
-    }
-
-    public boolean insertUsers(String email, String password){
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put("email", email);
-        contentValues.put("password", password);
-        db.insert("Users", null, contentValues);
-        return true;
-    }
-
-    public boolean checkUser(String username, String password){
+    public boolean checkLogin(String email, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("select * from Accounts where username=? and password=?", new String[]{username, password});
-        if(res.getCount()>0)
-            return true;
-        else return false;
+        String tableName = "users";
+        String emailColumn = "email";
+        String passwordColumn = "password";
+
+        String[] columns = {emailColumn};
+        String selection = emailColumn + " = ? AND " + passwordColumn + " = ?";
+        String[] selectionArgs = {email, password};
+
+        Cursor cursor = db.query(tableName, columns, selection, selectionArgs, null, null, null);
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        return exists;
     }
-
-    public void updatePassword(String email, String newPasswordHash) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put("password_hash", newPasswordHash);
-
-        // Cập nhật dòng có email tương ứng
-        db.update("users", values, "email = ?", new String[]{email});
-
-        // Đóng kết nối
-        db.close();
-    }
-
 }
+

@@ -23,9 +23,10 @@ public class MainActivity extends AppCompatActivity {
     Button btnLogin;
     TextView forgotPassword;
     Database dbHelper;
-//    Employee em;
+    User user;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        dbHelper = new Database(this);
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
@@ -39,9 +40,9 @@ public class MainActivity extends AppCompatActivity {
         inputemail = findViewById(R.id.inputemail);
         inputpassword = findViewById(R.id.inputpassword);
         btnLogin = findViewById(R.id.btnLogin);
-//        dbHelper = new Database(this);
+        dbHelper = new Database(this);
 
-        btnLogin.setOnClickListener(v -> login());
+
         forgotPassword=findViewById(R.id.forgotPassword);
         forgotPassword.setBackgroundColor(Color.TRANSPARENT);
         forgotPassword.setOnClickListener(new View.OnClickListener() {
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
+        btnLogin.setOnClickListener(v -> login());
     }
 
     private void login() {
@@ -63,17 +64,19 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        if (dbHelper.checkUser(email, password)) {
-            Intent intent = new Intent(MainActivity.this, Forgotpass.class);
-            // Lưu trữ username trong SharedPreferences
+        if (dbHelper.checkLogin(email, password)) {
+            // Lưu trữ email trong SharedPreferences
             SharedPreferences sharedPreferences = getSharedPreferences("SessionPref", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("email", email);
             editor.apply();
 
+            // Đăng nhập thành công, chuyển hướng sang màn hình chính hoặc màn hình khác
+            Intent intent = new Intent(MainActivity.this, Forgotpass.class);
             startActivity(intent);
-
+            finish(); // Kết thúc Activity hiện tại sau khi chuyển hướng
         } else {
+            // Thông báo lỗi khi đăng nhập không thành công
             Toast.makeText(this, "Tên đăng nhập hoặc mật khẩu không đúng.", Toast.LENGTH_SHORT).show();
         }
     }

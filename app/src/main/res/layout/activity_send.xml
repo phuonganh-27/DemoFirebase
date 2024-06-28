@@ -6,7 +6,7 @@
     android:background="#F6EBB0"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Forgotpass">
+    tools:context=".Send">
 
     <ImageView
         android:id="@+id/imageView"
@@ -25,31 +25,31 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="48dp"
-        android:text="Quên mật khẩu"
+        android:text="Nhập mã"
         android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/email"
+        app:layout_constraintBottom_toTopOf="@+id/ma"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
-        android:id="@+id/email"
+        android:id="@+id/ma"
         android:layout_width="300dp"
         android:layout_height="50dp"
         android:layout_marginBottom="48dp"
         android:background="@drawable/input_bg"
         android:ems="10"
         android:paddingLeft="12dp"
-        android:hint="Nhập email"
+        android:hint="Nhập mã"
         android:inputType="text"
         android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/btn_Forgotpass"
+        app:layout_constraintBottom_toTopOf="@+id/btn_xacnhan"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/btn_Forgotpass"
+        android:id="@+id/btn_xacnhan"
         android:layout_width="150dp"
         android:layout_height="43dp"
         android:layout_marginBottom="204dp"
